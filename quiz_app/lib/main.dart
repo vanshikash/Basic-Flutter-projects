@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,54 +16,62 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-   final questions = const [
-      {
-        'questionText': 'What\'s your favourite time of the day?',
-        'answers': ['morning', 'afternoon', 'evening', 'night'],
-      },
-      {
-        'questionText':  'What\'s your spirit animal?',
-        'answers': ['panda', 'lion', 'dog', 'cat'],
-      },
-      {
-        'questionText':  'What\'s your favorite genre of music',
-        'answers': ['pop', 'edm', 'rock', 'lofi'],
-      },
-     
-    ];
+  final _questions = const [
+    {
+      'questionText': 'What\'s your favourite time of the day?',
+      'answers': [{'text': 'morning', 'score': 5}, {'text' :'afternoon', 'score' : 2}, {'text': 'evening', 'score' : 7}, {'text': 'night', 'score' : 10}],
+    },
+    {
+      'questionText': 'What\'s your spirit animal?',
+      'answers': [{'text': 'panda', 'score': 10}, {'text' :'lion', 'score' : 8}, {'text': 'dog', 'score' : 7}, {'text': 'cat', 'score' : 5}],
+    },
+    {
+      'questionText': 'What\'s your favorite genre of music',
+      'answers': [{'text': 'pop', 'score': 10}, {'text' :'edm', 'score' : 8}, {'text': 'rock', 'score' : 5}, {'text': 'lofi', 'score' : 9}],
+    },
+  ];
   var _questionIndex = 0;
+  var _totalScore = 0;
 
-  void _answerQuestion() {
-    
+  void _resetQuiz()
+  {
+    setState((){
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
+  }
+
+  void _answerQuestion(int score) {
+
+    _totalScore += score;
+
+
     setState(() {
       _questionIndex++;
     });
 
     print(_questionIndex);
-    if(_questionIndex < questions.length){
+    if (_questionIndex < _questions.length) {
       print('We have more questions!');
+    } else {
+      print('No more questions!');
     }
   }
 
   @override // declarator
   Widget build(BuildContext context) {
-    
-   
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text('QUIZ APP'),
         ),
-        body: Column(
-          children: [
-            Question(
-              questions[_questionIndex]['questionText'],
-            ),
-            ...(questions[_questionIndex]['answers']as List<String>).map((answer) {
-              return Answer(_answerQuestion, answer);
-            }).toList()
-          ],
-        ),
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                answerQuestion: _answerQuestion,
+                questionIndex: _questionIndex,
+                questions: _questions,
+              )
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
